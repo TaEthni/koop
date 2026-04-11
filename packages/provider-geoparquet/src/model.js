@@ -33,7 +33,7 @@ class Model {
     const readOptions = this.#buildReadOptions(req);
 
     try {
-      const { rows, geoMetadata, totalRows, allColumnNames } = await readParquet(
+      const { rows, geoMetadata, totalRows } = await readParquet(
         source,
         this.#storageOptions,
         readOptions,

@@ -49,8 +49,9 @@ async function getConnection() {
  * @param {string[]} [readOptions.columns] - Columns to select
  * @param {string} [readOptions.where] - SQL WHERE clause
  * @param {number} [readOptions.limit] - Max rows to return
- * @param {number} [readOptions.simplifyTolerance] - Geometry simplification tolerance in degrees (0 = no simplify)
- * @returns {Promise<{rows: Array<Object>, geoMetadata: Object, totalRows: number, allColumnNames: string[]}>}
+ * @param {number} [readOptions.simplifyTolerance] - Simplification
+ *   tolerance in degrees (0 = no simplify)
+ * @returns {Promise<Object>} rows, geoMetadata, totalRows, allColumnNames
  */
 async function readParquet(source, storageOptions = {}, readOptions = {}) {
   const conn = await getConnection();
@@ -109,9 +110,7 @@ async function getParquetMetadata(conn, source) {
       // value comes back as a blob/bytes — decode it
       const geoValue = kvRows[0].value;
       const geoStr =
-        typeof geoValue === 'string'
-          ? geoValue
-          : Buffer.from(geoValue, 'base64').toString('utf-8');
+        typeof geoValue === 'string' ? geoValue : Buffer.from(geoValue, 'base64').toString('utf-8');
       const geo = JSON.parse(geoStr);
       const primaryColumn = geo.primary_column || 'geometry';
       const columnMeta = geo.columns?.[primaryColumn] || {};

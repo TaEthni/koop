@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /**
  * HTML form pages for GeoServices endpoints.
  * Mimics the ArcGIS Server REST API HTML interface.
@@ -200,12 +201,16 @@ function layerInfoHtml(req, data) {
       <tr><td class="prop">Feature Count</td><td class="val">${data?.count ?? data?.features?.length ?? 'unknown'}</td></tr>
     </table>
 
-    ${fields.length > 0 ? `
+    ${
+      fields.length > 0
+        ? `
     <h2>Fields</h2>
     <table>
       <tr><th>Name</th><th>Alias</th><th>Type</th></tr>
       ${fields.map((f) => `<tr><td>${f.name}</td><td>${f.alias || f.name}</td><td class="val">${f.type}</td></tr>`).join('\n      ')}
-    </table>` : ''}
+    </table>`
+        : ''
+    }
 
     <div class="ops">
       <h2>Supported Operations</h2>
