@@ -9,6 +9,7 @@ const {
   queryRelatedRecords,
 } = require('@koopjs/featureserver');
 const Logger = require('@koopjs/logger');
+const { queryFormHtml, layerInfoHtml, shouldServeHtml } = require('./html-forms');
 let logger = new Logger();
 const ARCGIS_UNAUTHORIZED_MESSAGE = 'Item does not exist or is inaccessible.';
 const ARCGIS_UNABLE_TO_GENERATE_TOKEN_MESSAGE = 'Unable to generate token.';
@@ -236,10 +237,22 @@ class GeoServices {
   }
 
   async layerInfoHandler(req, res) {
+    if (shouldServeHtml(req)) {
+      try {
+        const data = await this.model.pull(req);
+        return res.status(200).type('html').send(layerInfoHtml(req, data));
+      } catch (error) {
+        this.#errorHandler(error, req, res);
+        return;
+      }
+    }
     this.#pullDataHandler(req, res, layerInfo);
   }
 
   async queryHandler(req, res) {
+    if (shouldServeHtml(req)) {
+      return res.status(200).type('html').send(queryFormHtml(req));
+    }
     this.#pullDataHandler(req, res, query);
   }
 

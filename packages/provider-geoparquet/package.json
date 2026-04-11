@@ -1,0 +1,47 @@
+{
+  "name": "@koopjs/provider-geoparquet",
+  "version": "1.0.0",
+  "description": "Koop provider for reading GeoParquet files from any storage (local, HTTP, S3, Azure Blob, GCS) powered by DuckDB",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "mocha '**/*.spec.js' --reporter even-more-min --recursive -t 10000"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TaEthni/koop.git"
+  },
+  "keywords": [
+    "koop",
+    "provider",
+    "geoparquet",
+    "parquet",
+    "geospatial",
+    "arrow",
+    "geoarrow",
+    "duckdb",
+    "s3",
+    "azure",
+    "gcs",
+    "cloud-native"
+  ],
+  "author": "Lee Berryman",
+  "license": "Apache-2.0",
+  "files": [
+    "src/**/*.js",
+    "!**/*.spec.js"
+  ],
+  "bugs": {
+    "url": "https://github.com/TaEthni/koop/issues"
+  },
+  "homepage": "https://github.com/TaEthni/koop#readme",
+  "dependencies": {
+    "@duckdb/node-api": "^1.5.1-r.1",
+    "wkx": "^0.5.0"
+  },
+  "devDependencies": {
+    "even-more-min": "^1.0.1",
+    "mocha": "^10.8.2",
+    "should": "^13.2.3",
+    "sinon": "^18.0.1"
+  }
+}

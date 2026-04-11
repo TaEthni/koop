@@ -1,0 +1,43 @@
+{
+  "name": "@koopjs/geoarrow",
+  "version": "1.0.0",
+  "description": "GeoArrow encoding medium for Koop — columnar, binary alternative to GeoJSON for the internal pipeline",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "mocha '**/*.spec.js' --reporter even-more-min --recursive -t 10000"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TaEthni/koop.git"
+  },
+  "keywords": [
+    "koop",
+    "geoarrow",
+    "arrow",
+    "geojson",
+    "columnar",
+    "binary",
+    "geospatial",
+    "encoding"
+  ],
+  "author": "Lee Berryman",
+  "license": "Apache-2.0",
+  "files": [
+    "src/**/*.js",
+    "!**/*.spec.js"
+  ],
+  "bugs": {
+    "url": "https://github.com/TaEthni/koop/issues"
+  },
+  "homepage": "https://github.com/TaEthni/koop#readme",
+  "dependencies": {
+    "apache-arrow": "^18.1.0",
+    "wkx": "^0.5.0"
+  },
+  "devDependencies": {
+    "even-more-min": "^1.0.1",
+    "mocha": "^10.8.2",
+    "should": "^13.2.3",
+    "sinon": "^18.0.1"
+  }
+}
