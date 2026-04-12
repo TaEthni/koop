@@ -125,7 +125,9 @@ class Model {
     return {
       where: q.where ? sanitizeWhere(q.where) : undefined,
       columns: q.outFields ? sanitizeOutFields(q.outFields) : [],
-      limit: q.resultRecordCount ? parseInt(q.resultRecordCount, 10) : undefined,
+      limit: q.resultRecordCount
+        ? parseInt(q.resultRecordCount, 10)
+        : parseInt(process.env.DUCKDB_DEFAULT_LIMIT || '1000', 10),
       offset: q.resultOffset ? parseInt(q.resultOffset, 10) : undefined,
       orderBy: q.orderByFields || undefined,
       simplifyTolerance: q.simplify
@@ -159,9 +161,10 @@ class Model {
       const base = this.#dataDir.replace(/\/$/, '');
       let url = `${base}/${filename}`;
       // Append SAS token for Azure Blob HTTPS URLs if available
+      // decodeURIComponent handles env vars that got URL-encoded by shell
       const sas = process.env.AZURE_STORAGE_SAS;
       if (sas && url.includes('.blob.core.windows.net')) {
-        url += `?${sas}`;
+        url += `?${decodeURIComponent(sas)}`;
       }
       return url;
     }
