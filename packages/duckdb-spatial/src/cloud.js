@@ -36,13 +36,27 @@ async function configureAzure(conn, options) {
   const accountName = options.accountName || process.env.AZURE_STORAGE_ACCOUNT;
   const accountKey = options.accountKey || process.env.AZURE_STORAGE_KEY;
 
-  if (accountName) {
-    const keyClause = accountKey ? `, ACCOUNT_KEY '${escapeSql(accountKey)}'` : '';
+  if (accountName && accountKey) {
+    // DuckDB azure extension uses CONNECTION_STRING for account key auth
+    const connStr =
+      `DefaultEndpointsProtocol=https;` +
+      `AccountName=${accountName};` +
+      `AccountKey=${accountKey};` +
+      `EndpointSuffix=core.windows.net`;
     await conn.run(`
       CREATE OR REPLACE SECRET (
         TYPE azure,
+        PROVIDER config,
+        CONNECTION_STRING '${escapeSql(connStr)}'
+      )
+    `);
+  } else if (accountName) {
+    // No key — use credential_chain (managed identity, az cli, etc.)
+    await conn.run(`
+      CREATE OR REPLACE SECRET (
+        TYPE azure,
+        PROVIDER credential_chain,
         ACCOUNT_NAME '${escapeSql(accountName)}'
-        ${keyClause}
       )
     `);
   }
