@@ -34,6 +34,9 @@ RUN node -e " \
 FROM node:22-slim
 WORKDIR /app
 
+# Install CA certificates (required for DuckDB HTTPS/Azure connections)
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && rm -rf /var/lib/apt/lists/*
+
 # Create non-root user
 RUN groupadd -r koop && useradd -r -g koop -m koop
 
