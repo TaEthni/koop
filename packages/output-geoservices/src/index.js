@@ -104,7 +104,7 @@ class GeoServices {
       handler: 'queryRelatedRecordsHandler',
     },
     {
-      path: '$namespace/rest/services/$providerParams/MapServer*',
+      path: '$namespace/rest/services/$providerParams/MapServer{/*path}',
       methods: ['get', 'post'],
       handler: 'invalidUrlHandler',
     },
