@@ -1,24 +1,27 @@
 const Koop = require('@koopjs/koop-core');
-const geoparquetProvider = require('@koopjs/provider-geoparquet');
+const duckdbProvider = require('@koopjs/provider-duckdb');
 
 const koop = new Koop({ logLevel: 'debug' });
 
-koop.register(geoparquetProvider, {
-  dataDir: '/mnt/c/Users/LBerryman/repos/admin-boundaries-sql/migration/scripts/exports/eoe_v2',
+koop.register(duckdbProvider, {
+  dataDir:
+    '/mnt/c/Users/LBerryman/repos/admin-boundaries-sql/' +
+    'migration/scripts/exports/eoe_v2',
 });
 
 const port = process.env.PORT || 8080;
 koop.server.listen(port, () => {
-  console.log(`\nKoop GeoParquet demo running on http://localhost:${port}`);
-  console.log(`\nTry these endpoints:`);
-  console.log(`  FeatureServer info:`);
-  console.log(`    http://localhost:${port}/geoparquet/rest/services/adm0_osm_enriched/FeatureServer/0`);
-  console.log(`  Query (JSON):`);
-  console.log(`    http://localhost:${port}/geoparquet/rest/services/adm0_osm_enriched/FeatureServer/0/query?where=1=1&outFields=iso3,name,area_km2&f=json&resultRecordCount=10`);
-  console.log(`  Query (GeoJSON):`);
-  console.log(`    http://localhost:${port}/geoparquet/rest/services/adm0_osm_enriched/FeatureServer/0/query?where=1=1&outFields=iso3,name,area_km2&f=geojson&resultRecordCount=10`);
-  console.log(`  Query (PBF):`);
-  console.log(`    http://localhost:${port}/geoparquet/rest/services/adm0_osm_enriched/FeatureServer/0/query?where=1=1&outFields=iso3,name&f=pbf&resultRecordCount=5`);
-  console.log(`  Single country:`);
-  console.log(`    http://localhost:${port}/geoparquet/rest/services/adm0_osm_enriched/FeatureServer/0/query?where=iso3='USA'&outFields=*&f=geojson`);
+  const base = `http://localhost:${port}/duckdb/rest/services`;
+  console.log(`\nKoop DuckDB provider running on port ${port}`);
+  console.log(`\nGeoParquet:`);
+  console.log(`  ${base}/adm0_osm_enriched/FeatureServer/0?f=html`);
+  console.log(`  ${base}/adm0_osm_enriched/FeatureServer/0/query?f=html`);
+  console.log(`\nQuery examples:`);
+  console.log(`  JSON:    ...query?where=1=1&outFields=iso3,name&f=json&resultRecordCount=10`);
+  console.log(`  GeoJSON: ...query?where=iso3='USA'&outFields=*&simplify=0.01&f=geojson`);
+  console.log(`  PBF:     ...query?where=1=1&outFields=*&simplify=0.01&f=pbf&resultRecordCount=5`);
+  console.log(`\nCSV (with lat/lon):    ...services/my_data.csv/FeatureServer/0/query?f=html`);
+  console.log(`Shapefile:             ...services/my_data.shp/FeatureServer/0/query?f=html`);
+  console.log(`Iceberg:               ...services/path%2Fto%2Ficeberg/FeatureServer/0/query?format=iceberg&f=html`);
+  console.log(`Delta:                 ...services/path%2Fto%2Fdelta/FeatureServer/0/query?format=delta&f=html`);
 });

@@ -2,7 +2,7 @@ const Model = require('./model');
 
 const provider = {
   type: 'provider',
-  name: 'geoparquet',
+  name: 'duckdb',
   hosts: false,
   disableIdParam: false,
   Model,

@@ -38,7 +38,8 @@
     "packages/featureserver",
     "packages/output-geoservices",
     "packages/geoarrow",
-    "packages/provider-geoparquet",
+    "packages/duckdb-spatial",
+    "packages/provider-duckdb",
     "packages/logger",
     "packages/cache-memory",
     "packages/core"

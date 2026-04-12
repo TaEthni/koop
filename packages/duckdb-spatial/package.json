@@ -1,0 +1,35 @@
+{
+  "name": "@koopjs/duckdb-spatial",
+  "version": "1.0.0",
+  "description": "Shared DuckDB spatial engine for Koop providers — connection management, cloud access, geometry handling",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "mocha '**/*.spec.js' --reporter even-more-min --recursive -t 10000"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TaEthni/koop.git"
+  },
+  "keywords": [
+    "koop",
+    "duckdb",
+    "spatial",
+    "geoparquet",
+    "iceberg",
+    "delta"
+  ],
+  "author": "Lee Berryman",
+  "license": "Apache-2.0",
+  "files": [
+    "src/**/*.js",
+    "!**/*.spec.js"
+  ],
+  "dependencies": {
+    "@duckdb/node-api": "^1.5.1-r.1"
+  },
+  "devDependencies": {
+    "even-more-min": "^1.0.1",
+    "mocha": "^10.8.2",
+    "sinon": "^18.0.1"
+  }
+}
