@@ -33,7 +33,9 @@ function rowsToGeoJSON(rows, geomCol, opts = {}) {
     return { type: 'Feature', properties, geometry };
   });
 
-  const name = opts.layerName || (opts.source ? path.basename(opts.source, '.parquet') : 'layer');
+  // Strip query string (SAS tokens, etc.) before extracting basename
+  const cleanSource = opts.source ? opts.source.split('?')[0] : '';
+  const name = opts.layerName || (cleanSource ? path.basename(cleanSource, '.parquet') : 'layer');
 
   const geojson = {
     type: 'FeatureCollection',
