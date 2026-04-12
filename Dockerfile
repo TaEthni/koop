@@ -1,24 +1,17 @@
 # Multi-stage build for Koop DuckDB FeatureServer
 # Uses node:22-slim (Debian) — DuckDB native binaries require glibc, not musl (Alpine)
 
-# Stage 1: Install production dependencies
+# Stage 1: Install dependencies
 FROM node:22-slim AS build
 WORKDIR /app
 
-# Copy package files for all workspace packages
+# Copy everything needed for npm ci (workspace structure must exist)
 COPY package.json package-lock.json ./
-COPY packages/core/package.json packages/core/
-COPY packages/featureserver/package.json packages/featureserver/
-COPY packages/output-geoservices/package.json packages/output-geoservices/
-COPY packages/winnow/package.json packages/winnow/
-COPY packages/logger/package.json packages/logger/
-COPY packages/cache-memory/package.json packages/cache-memory/
-COPY packages/geoarrow/package.json packages/geoarrow/
-COPY packages/duckdb-spatial/package.json packages/duckdb-spatial/
-COPY packages/provider-duckdb/package.json packages/provider-duckdb/
+COPY packages/ ./packages/
+COPY server.js ./
 
 # --ignore-scripts skips the "prepare" hook (husky install) which
-# requires devDependencies. Husky is not needed in production.
+# requires devDependencies not present with --omit=dev
 RUN npm ci --omit=dev --ignore-scripts
 
 # Stage 2: Production image
@@ -28,11 +21,11 @@ WORKDIR /app
 # Create non-root user
 RUN groupadd -r koop && useradd -r -g koop -m koop
 
-# Copy dependencies and source
+# Copy app with resolved dependencies
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/package.json ./
-COPY packages/ ./packages/
-COPY server.js ./
+COPY --from=build /app/packages ./packages
+COPY --from=build /app/server.js ./
 
 # DuckDB needs a writable dir for extension downloads
 RUN mkdir -p /tmp/duckdb && chown koop:koop /tmp/duckdb
