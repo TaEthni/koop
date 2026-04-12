@@ -17,7 +17,9 @@ COPY packages/geoarrow/package.json packages/geoarrow/
 COPY packages/duckdb-spatial/package.json packages/duckdb-spatial/
 COPY packages/provider-duckdb/package.json packages/provider-duckdb/
 
-RUN npm ci --omit=dev
+# --ignore-scripts skips the "prepare" hook (husky install) which
+# requires devDependencies. Husky is not needed in production.
+RUN npm ci --omit=dev --ignore-scripts
 
 # Stage 2: Production image
 FROM node:22-slim
