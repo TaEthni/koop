@@ -1,4 +1,4 @@
-const { getConnection, ensureExtension, resetConnection } = require('./connection');
+const { acquireConnection, ensureExtension, resetConnection } = require('./connection');
 const { configureCloudAccess } = require('./cloud');
 const {
   escapeSql,
@@ -17,7 +17,7 @@ const {
 } = require('./geometry');
 
 module.exports = {
-  getConnection,
+  acquireConnection,
   ensureExtension,
   resetConnection,
   configureCloudAccess,

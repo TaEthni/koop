@@ -1,6 +1,6 @@
 const path = require('path');
 const {
-  getConnection,
+  acquireConnection,
   ensureExtension,
   configureCloudAccess,
   sanitizeWhere,
@@ -49,9 +49,8 @@ class Model {
 
     this.#logger.info?.(`${LOG_PREFIX} ${query.format || 'auto'} → ${source}`);
 
+    const conn = await acquireConnection();
     try {
-      const conn = await getConnection();
-
       // Build scan expression and load required extensions
       const { scanExpr, duckdbExtensions } = buildScanExpr(source, query.format, {
         table: query.table,
@@ -103,13 +102,19 @@ class Model {
         geometryType: geomInfo.geometryTypes?.[0],
       });
     } catch (err) {
-      if (err.message?.includes('No such file') || err.message?.includes('not found')) {
+      // Strip SAS tokens / credentials from error messages
+      const safeSource = source.split('?')[0];
+      const safeMsg = (err.message || '').replace(/\?[^\s'"]+/g, '?[REDACTED]');
+
+      if (safeMsg.includes('No such file') || safeMsg.includes('Could not open file')) {
         err.code = 404;
-        err.message = `${LOG_PREFIX} not found: ${source}`;
+        err.message = `${LOG_PREFIX} not found: ${safeSource}`;
       } else if (err.code !== 400) {
-        err.message = `${LOG_PREFIX} ${err.message}`;
+        err.message = `${LOG_PREFIX} ${safeMsg}`;
       }
       throw err;
+    } finally {
+      conn.release();
     }
   }
 
