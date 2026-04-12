@@ -12,8 +12,10 @@ const _loadedExtensions = new Set();
 async function getConnection() {
   if (_connection) return _connection;
 
+  const memoryLimit = process.env.DUCKDB_MEMORY_LIMIT || '6GB';
   _instance = await DuckDBInstance.create(':memory:', {
     allow_unsigned_extensions: 'true',
+    memory_limit: memoryLimit,
   });
   _connection = await _instance.connect();
 

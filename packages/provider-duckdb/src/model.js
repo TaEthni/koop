@@ -128,7 +128,9 @@ class Model {
       limit: q.resultRecordCount ? parseInt(q.resultRecordCount, 10) : undefined,
       offset: q.resultOffset ? parseInt(q.resultOffset, 10) : undefined,
       orderBy: q.orderByFields || undefined,
-      simplifyTolerance: q.simplify ? parseFloat(q.simplify) : undefined,
+      simplifyTolerance: q.simplify
+        ? parseFloat(q.simplify)
+        : parseFloat(process.env.DUCKDB_DEFAULT_SIMPLIFY || '0'),
       format: q.format || undefined,
       table: q.table || undefined,
     };
