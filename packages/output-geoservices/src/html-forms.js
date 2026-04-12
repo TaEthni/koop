@@ -226,7 +226,7 @@ function shouldServeHtml(req) {
   if (f === 'html') return true;
   if (f) return false;
   // No f param — check Accept header for text/html (browser request)
-  const accept = req.get('accept') || '';
+  const accept = (typeof req.get === 'function' ? req.get('accept') : req.headers?.accept) || '';
   return accept.includes('text/html');
 }
 
