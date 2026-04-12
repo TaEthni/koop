@@ -192,7 +192,7 @@ class GeoServices {
       return authorization.replace(/^Bearer /, '');
     }
 
-    return query.token || body.token;
+    return query?.token || body?.token;
   }
 
   restInfoHandler(req, res) {

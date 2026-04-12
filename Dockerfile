@@ -1,7 +1,7 @@
 # Multi-stage build for Koop DuckDB FeatureServer
 # Uses node:22-slim (Debian) — DuckDB native binaries require glibc, not musl (Alpine)
 
-# Stage 1: Install dependencies
+# Stage 1: Install dependencies and pre-warm DuckDB extensions
 FROM node:22-slim AS build
 WORKDIR /app
 
@@ -13,6 +13,22 @@ COPY server.js ./
 # --ignore-scripts skips the "prepare" hook (husky install) which
 # requires devDependencies not present with --omit=dev
 RUN npm ci --omit=dev --ignore-scripts
+
+# Pre-install DuckDB extensions so they're baked into the image.
+# No cold-start download needed at runtime.
+RUN node -e " \
+  const { DuckDBInstance } = require('@duckdb/node-api'); \
+  (async () => { \
+    const db = await DuckDBInstance.create(':memory:'); \
+    const conn = await db.connect(); \
+    await conn.run('INSTALL spatial'); \
+    await conn.run('INSTALL httpfs'); \
+    await conn.run('INSTALL azure'); \
+    await conn.run('INSTALL iceberg'); \
+    await conn.run('INSTALL delta'); \
+    console.log('DuckDB extensions installed'); \
+  })(); \
+"
 
 # Stage 2: Production image
 FROM node:22-slim
@@ -27,8 +43,10 @@ COPY --from=build /app/package.json ./
 COPY --from=build /app/packages ./packages
 COPY --from=build /app/server.js ./
 
-# DuckDB needs a writable dir for extension downloads
-RUN mkdir -p /tmp/duckdb && chown koop:koop /tmp/duckdb
+# Copy pre-installed DuckDB extensions from build stage
+COPY --from=build /root/.duckdb /home/koop/.duckdb
+
+RUN chown -R koop:koop /home/koop/.duckdb
 ENV HOME=/home/koop
 
 EXPOSE 8080

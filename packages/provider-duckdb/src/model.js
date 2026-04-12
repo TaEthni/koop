@@ -142,6 +142,7 @@ class Model {
    * @returns {string}
    */
   #resolveSource(id) {
+    // If the id itself is a cloud URI, pass through
     const cloudPrefixes = ['http://', 'https://', 's3://', 'az://', 'abfss://', 'gs://', 'gcs://'];
     if (cloudPrefixes.some((p) => id.startsWith(p))) {
       return id;
@@ -150,6 +151,13 @@ class Model {
     // Check if it has an extension already
     const hasExt = path.extname(id).length > 1;
     const filename = hasExt ? id : `${id}.parquet`;
+
+    // If dataDir is a cloud URI prefix, join as cloud path
+    if (cloudPrefixes.some((p) => this.#dataDir.startsWith(p))) {
+      const base = this.#dataDir.replace(/\/$/, '');
+      return `${base}/${filename}`;
+    }
+
     return path.resolve(process.cwd(), this.#dataDir, filename);
   }
 }
