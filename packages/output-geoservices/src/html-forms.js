@@ -5,7 +5,8 @@
  */
 
 function queryFormHtml(req) {
-  const baseUrl = `${req.protocol}://${req.get('host')}${req.originalUrl.split('?')[0]}`;
+  const proto = req.get('x-forwarded-proto') || req.protocol;
+  const baseUrl = `${proto}://${req.get('host')}${req.originalUrl.split('?')[0]}`;
   const parentUrl = baseUrl.replace(/\/query$/, '');
 
   return `<!DOCTYPE html>
@@ -143,10 +144,10 @@ function queryFormHtml(req) {
       <div class="form-group">
         <label for="f">Format (f)</label>
         <select id="f" name="f">
+          <option value="pjson" selected>Pretty JSON</option>
           <option value="json">JSON (Esri)</option>
           <option value="geojson">GeoJSON</option>
           <option value="pbf">PBF (Protocol Buffers)</option>
-          <option value="pjson">Pretty JSON</option>
           <option value="html">HTML (this form)</option>
         </select>
       </div>
@@ -162,7 +163,8 @@ function queryFormHtml(req) {
 }
 
 function layerInfoHtml(req, data) {
-  const baseUrl = `${req.protocol}://${req.get('host')}${req.originalUrl.split('?')[0]}`;
+  const proto = req.get('x-forwarded-proto') || req.protocol;
+  const baseUrl = `${proto}://${req.get('host')}${req.originalUrl.split('?')[0]}`;
   const queryUrl = `${baseUrl}/query`;
   const meta = data?.metadata || {};
   const fields = meta.fields || [];

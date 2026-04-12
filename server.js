@@ -6,6 +6,9 @@ const port = process.env.PORT || 8080;
 
 const koop = new Koop({ logLevel });
 
+// Trust proxy headers (X-Forwarded-Proto, X-Forwarded-For) from nginx ingress
+koop.server.set('trust proxy', true);
+
 koop.register(duckdbProvider, {
   dataDir: process.env.DUCKDB_DATA_DIR || './data',
   ttl: parseInt(process.env.KOOP_CACHE_TTL || '0', 10),
