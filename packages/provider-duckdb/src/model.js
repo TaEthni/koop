@@ -69,15 +69,22 @@ class Model {
       // Get schema and count
       const { allColumnNames, totalRows } = await getSchemaAndCount(conn, scanExpr);
 
+      // Strip OBJECTID from requested columns if it doesn't exist in source
+      // (ArcGIS Pro auto-requests it but we generate it via row_number)
+      const hasObjectId = allColumnNames.some((c) => c.toUpperCase() === 'OBJECTID');
+      const filteredColumns = hasObjectId
+        ? query.columns
+        : query.columns.filter((c) => c.toUpperCase() !== 'OBJECTID');
+
       // Build query with geometry conversion + SQL injection protection
       const selectCols = buildSelectWithGeom(
-        query.columns,
+        filteredColumns,
         allColumnNames,
         geomInfo,
         query.simplifyTolerance,
       );
-
-      let sql = `SELECT ${selectCols} FROM ${scanExpr}`;
+      const objectIdExpr = hasObjectId ? '' : 'row_number() OVER () AS OBJECTID, ';
+      let sql = `SELECT ${objectIdExpr}${selectCols} FROM ${scanExpr}`;
 
       if (query.where && query.where !== '1=1') {
         sql += ` WHERE ${query.where}`;
