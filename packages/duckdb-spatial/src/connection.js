@@ -19,6 +19,16 @@ async function getConnection() {
 
   await ensureExtension(_connection, 'spatial');
 
+  // Set CA cert path for httpfs HTTPS connections (Linux containers)
+  const fs = require('fs');
+  const caPaths = ['/etc/ssl/certs/ca-certificates.crt', '/etc/pki/tls/certs/ca-bundle.crt'];
+  for (const p of caPaths) {
+    if (fs.existsSync(p)) {
+      await _connection.run(`SET ca_cert_file = '${p}'`);
+      break;
+    }
+  }
+
   return _connection;
 }
 
