@@ -155,7 +155,13 @@ class Model {
     // If dataDir is a cloud URI prefix, join as cloud path
     if (cloudPrefixes.some((p) => this.#dataDir.startsWith(p))) {
       const base = this.#dataDir.replace(/\/$/, '');
-      return `${base}/${filename}`;
+      let url = `${base}/${filename}`;
+      // Append SAS token for Azure Blob HTTPS URLs if available
+      const sas = process.env.AZURE_STORAGE_SAS;
+      if (sas && url.includes('.blob.core.windows.net')) {
+        url += `?${sas}`;
+      }
+      return url;
     }
 
     return path.resolve(process.cwd(), this.#dataDir, filename);
