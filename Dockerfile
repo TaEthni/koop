@@ -1,20 +1,43 @@
-# Use the official Node.js image as the base image
-FROM node:16.20.2
+# Multi-stage build for Koop DuckDB FeatureServer
+# Uses node:22-slim (Debian) — DuckDB native binaries require glibc, not musl (Alpine)
 
-# Set the working directory in the Docker container
-WORKDIR /usr/src/app
+# Stage 1: Install production dependencies
+FROM node:22-slim AS build
+WORKDIR /app
 
-# Copy the package.json and package-lock.json files to the container
+# Copy package files for all workspace packages
 COPY package.json package-lock.json ./
+COPY packages/core/package.json packages/core/
+COPY packages/featureserver/package.json packages/featureserver/
+COPY packages/output-geoservices/package.json packages/output-geoservices/
+COPY packages/winnow/package.json packages/winnow/
+COPY packages/logger/package.json packages/logger/
+COPY packages/cache-memory/package.json packages/cache-memory/
+COPY packages/geoarrow/package.json packages/geoarrow/
+COPY packages/duckdb-spatial/package.json packages/duckdb-spatial/
+COPY packages/provider-duckdb/package.json packages/provider-duckdb/
 
-# Install the required npm packages in the container
-RUN npm install
+RUN npm ci --omit=dev
 
-# Copy the demo code and other necessary files to the container
-COPY demo ./demo
+# Stage 2: Production image
+FROM node:22-slim
+WORKDIR /app
 
-# Expose port 8080 for the Koop server
+# Create non-root user
+RUN groupadd -r koop && useradd -r -g koop -m koop
+
+# Copy dependencies and source
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/package.json ./
+COPY packages/ ./packages/
+COPY server.js ./
+
+# DuckDB needs a writable dir for extension downloads
+RUN mkdir -p /tmp/duckdb && chown koop:koop /tmp/duckdb
+ENV HOME=/home/koop
+
 EXPOSE 8080
 
-# Start the Koop server
-CMD ["node", "demo/index.js"]
+USER koop
+
+CMD ["node", "server.js"]
