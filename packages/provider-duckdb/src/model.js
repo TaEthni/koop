@@ -86,6 +86,10 @@ class Model {
       const objectIdExpr = hasObjectId ? '' : 'row_number() OVER () AS OBJECTID, ';
       let sql = `SELECT ${objectIdExpr}${selectCols} FROM ${scanExpr}`;
 
+      const dbg = `cols=${JSON.stringify(filteredColumns)}`;
+      this.#logger.debug?.(`${LOG_PREFIX} ${dbg}`);
+      this.#logger.debug?.(`${LOG_PREFIX} ${sql.substring(0, 200)}`);
+
       if (query.where && query.where !== '1=1') {
         sql += ` WHERE ${query.where}`;
       }
