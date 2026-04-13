@@ -130,13 +130,19 @@ function sanitizeWhere(where) {
 function sanitizeOutFields(outFields) {
   if (!outFields || outFields === '*') return [];
 
-  return outFields.split(',').map((f) => {
-    const trimmed = f.trim();
-    if (!/^[a-zA-Z_][a-zA-Z0-9_.]*$/.test(trimmed)) {
-      throw makeInjectionError(`Invalid field name: ${trimmed}`);
-    }
-    return trimmed;
-  });
+  // ArcGIS Pro may send outFields as an array (POST) or string (GET)
+  const fields = Array.isArray(outFields) ? outFields : String(outFields).split(',');
+
+  return fields
+    .map((f) => {
+      const trimmed = String(f).trim();
+      if (!trimmed || trimmed === '*') return null;
+      if (!/^[a-zA-Z_][a-zA-Z0-9_.]*$/.test(trimmed)) {
+        throw makeInjectionError(`Invalid field name: ${trimmed}`);
+      }
+      return trimmed;
+    })
+    .filter(Boolean);
 }
 
 function makeInjectionError(message) {
