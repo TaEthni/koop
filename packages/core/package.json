@@ -23,15 +23,15 @@
     "@koopjs/logger": "5.0.0",
     "@koopjs/output-geoservices": "8.1.25",
     "@sindresorhus/fnv1a": "^2.0.1",
-    "body-parser": "^1.19.0",
-    "compression": "^1.7.5",
+    "body-parser": "^1.20.5",
+    "compression": "^1.8.1",
     "config": "^3.3.12",
     "cors": "^2.8.5",
     "easy-table": "^1.1.1",
     "ejs": "^3.1.10",
-    "express": "^4.21.2",
+    "express": "^4.22.1",
     "joi": "^17.13.3",
-    "lodash": "^4.17.15"
+    "lodash": "^4.18.1"
   },
   "devDependencies": {
     "even-more-min": "^1.0.1",
